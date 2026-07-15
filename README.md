@@ -13,7 +13,7 @@ The orchestrator never edits, writes, or runs tests. It thinks, decomposes the m
 - **Orchestrator does zero file work.** No edits, no writes, no test runs as deliverables. It plans, dispatches, reviews gates, and rules on disputes, so its context window is never consumed by raw command output or diffs.
 - **Workers execute in the background** on cheaper models, on their own branch and worktree, committing and pushing after every coherent deliverable so a killed or context-exhausted worker never loses progress.
 - **Independent verification gates** re-run any worker's claimed tests or deployments before the pipeline advances, catching stale or misreported results rather than trusting them.
-- **A foot-gun ledger** carries known tool and environment traps forward into every worker brief so the same mistake is never paid for twice.
+- **A pitfall ledger** carries known tool and environment traps forward into every worker brief so the same mistake is never paid for twice.
 - **Escalation is bounded.** The orchestrator resolves technical and scope questions autonomously within an agreed blast radius, and only surfaces genuine scope changes, destructive actions, or infrastructure decisions to the user.
 
 ## Why
@@ -27,7 +27,7 @@ Splitting the work fixes both problems at once. The orchestrator's context stays
 ```
 skills/orchestrate/
   SKILL.md       Core rules: role definition, pipeline, verification gates, escalation policy, definition of done
-  PLAYBOOK.md    Worker and verification brief templates, observed failure modes, the foot-gun ledger
+  PLAYBOOK.md    Worker and verification brief templates, observed failure modes, the pitfall ledger
 ```
 
 ## Models

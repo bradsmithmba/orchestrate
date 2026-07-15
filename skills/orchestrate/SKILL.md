@@ -18,9 +18,9 @@ Workers are background subagents (Agent tool, general-purpose, model: sonnet by 
 </pipeline>
 
 <verification_gates>
-MANDATORY: any worker report claiming tests pass, data changed, infrastructure deployed, or a shared-file merge or reconciliation completed gets an independent verification worker before the pipeline advances. The verifier re-runs the claimed commands, quotes exact output, spot-checks the riskiest code paths with file citations, and audits anything touching live systems. Advisory only for pure-docs deliverables (the next stage's worker doubles as the reader), EXCEPT closeout status docs and registries: they restate the mission's measured evidence and seed future baselines, so they get the same independent verification as a test-pass claim.
+MANDATORY: any worker report claiming tests pass, data changed, infrastructure deployed, or a shared-file merge or reconciliation completed gets an independent verification worker before the pipeline advances. The verifier is always a separate worker instance with clean context separate from the one whose claim it checks, never the same running instance re-checking its own output. The verifier re-runs the claimed commands, quotes exact output, spot-checks the riskiest code paths with file citations, and audits anything touching live systems. Advisory only for pure-docs deliverables (the next stage's worker doubles as the reader), EXCEPT closeout status docs and registries: they restate the mission's measured evidence and seed future baselines, so they get the same independent verification as a test-pass claim.
 
-Verification earns its cost: in practice it catches misreported counts, latent defects in untested branches, live-environment fixture bugs, and CI-only dependency gaps that local runs mask. Fold verification into a merge worker only when all three conditions hold: the merge worker was not the build worker whose claims it checks, its brief carries the verification template's duties, and it independently re-runs every claimed suite itself.
+Verification earns its cost: in practice it catches misreported counts, latent defects in untested branches, live-environment fixture bugs, and CI-only dependency gaps that local runs mask. Fold verification into a merge worker only when all three conditions hold: the merge worker was not the build worker whose claims it checks, its brief carries the verification template's duties, and it independently re-runs every claimed suite itself. The verification duties come first as a discrete no-change phase, exactly as verification_brief_template specifies (analyze and report, change nothing); only after that phase is reported does the same worker proceed to perform the merge itself, so the template's no-change contract still holds for the verification phase proper.
 </verification_gates>
 
 <reporting_integrity>
@@ -44,8 +44,8 @@ Escalate to the user only for: genuine scope changes, destructive or hard-to-rev
 
 <mission_hygiene>
 - Track the mission with the task tools: one task per track or major phase, statuses kept current.
-- Keep the mission resumable by a fresh orchestrator session: the task list, the audit log, and memory together must always record the active tracks with their branches and latest verified state, gate status per track, pending rulings, and the current foot-gun ledger. Workers checkpoint through commits; this is the orchestrator's own checkpoint.
-- Keep a running foot-gun ledger (tool traps and environment traps already paid for once) and propagate it into every worker brief. See PLAYBOOK.md for the accumulated starter ledger and why each entry exists.
+- Keep the mission resumable by a fresh orchestrator session: the task list, the audit log, and memory together must always record the active tracks with their branches and latest verified state, gate status per track, pending rulings, and the current pitfall ledger. Workers checkpoint through commits; this is the orchestrator's own checkpoint.
+- Keep a running pitfall ledger (tool traps and environment traps already paid for once) and propagate it into every worker brief. See PLAYBOOK.md for the accumulated starter ledger and why each entry exists.
 - Record incidents and rulings in the project's audit log via worker commits, not just in conversation.
 - Credentials never appear in briefs, worker reports, commit messages, or committed files; they ride only in environment variables at execution time, and the project's secrets scan gates every push where one exists.
 - When the environment provides a persistent memory mechanism, update it at mission milestones so a future session inherits state, baselines, and known failure modes. Write only within that mechanism's designated location and never record credentials or secret values in memory. Before writing, check whether the designated location falls inside the project working tree; if it does, escalate to the user for confirmation instead of assuming it is safe. Memory updates are the orchestrator's own responsibility, never delegated into a worker brief: the memory mechanism belongs to the orchestrator's session, and writing it is orchestration, not project file work.
@@ -56,5 +56,5 @@ A mission is complete when: every approved track is merged to the mainline with 
 </definition_of_done>
 
 <references>
-Worker brief template, verification brief template, observed worker failure modes, and the foot-gun ledger discipline: see [PLAYBOOK.md](PLAYBOOK.md).
+Worker brief template, verification brief template, observed worker failure modes, and the pitfall ledger discipline: see [PLAYBOOK.md](PLAYBOOK.md).
 </references>
