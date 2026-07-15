@@ -2,7 +2,7 @@
 
 A Claude Code skill that enforces a split of thinking, work and validation across multiple tiers.
 
-A smarter (more expensive) model acts as a leader/orchestrator, then capable-but-less-expensive models (Sonnet by default) execute the workand then that work is independently verified.
+A smarter (more expensive) model acts as a leader/orchestrator, then capable-but-less-expensive models (Sonnet by default) execute the work, then that work is independently verified.
 
 The orchestrator never edits, writes, or runs tests. It thinks, decomposes the mission into staged tracks, briefs workers, reviews their reports as gates, and rules on disputes. Every token spent on file diffs, command output, and test logs is spent by a worker, not by the orchestrator. This keeps the expensive model's context reserved for the one thing it is actually being paid for: judgment. Cost and context usage scale with the cheap tier, not the expensive one, even as the mission grows in size.
 
