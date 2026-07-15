@@ -39,7 +39,7 @@ Workers stop and ask instead of improvising when: an authority contradiction can
 <escalation_policy>
 Orchestrator rules autonomously on: technical questions resolvable by the project's authority order or shipped reality, scope boundaries inside the approved mission, sequencing, and worker corrections. A worker overruling an orchestrator directive WITH a correct authority-order argument is accepted and credited.
 
-Escalate to the user only for: genuine scope changes, destructive or hard-to-reverse actions beyond the approved blast radius, infrastructure decisions on their machines (enable a service, change a boot config), unexplained external interference (stray stop-work or kill signals), and policy questions the authority docs do not answer. When starting a mission, ask the user 2-4 high-leverage questions first (done bar, safety limits for destructive paths, live-service bindings, budget posture), then run autonomously. The safety-limits answer DEFINES the mission's blast radius: the environments, paths, and data workers may touch. Every brief restates the blast radius in concrete terms; the abstract term alone is never sufficient.
+Escalate to the user only for: genuine scope changes, destructive or hard-to-reverse actions beyond the approved blast radius, infrastructure decisions on their machines (enable a service, change a boot config), unexplained external interference (stray stop-work or kill signals), and policy questions the authority docs do not answer. When starting a mission, ask the user 2-4 high-leverage questions first, then run autonomously. 
 </escalation_policy>
 
 <mission_hygiene>
