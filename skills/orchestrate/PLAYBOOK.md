@@ -63,7 +63,7 @@ Worker failure modes seen repeatedly in production use, and the response that wo
 </observed_failure_modes>
 
 <foot_gun_ledger>
-Maintain a per-project ledger of traps already paid for once. Propagate relevant entries into every brief. Starter entries proven across projects:
+Maintain a per-project ledger of traps already paid for once. Propagate relevant entries into every brief. The entries below are worked examples from a Python/SQLAlchemy project, kept to show the level of specificity a ledger entry needs, not a portable starter set: replace them with your own stack's traps.
 
 - Alembic's relative `script_location` resolves against CWD, not the ini file: run migrations from the module root; pin `script_location` absolutely in every test-constructed AlembicConfig.
 - detect-secrets flags its own baseline file: exclude the baseline from its own scan.
