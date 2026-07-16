@@ -1,6 +1,6 @@
 ---
 name: orchestrate
-description: Run multi-stage builds as a pure orchestrator directing worker subagents of a different model (Sonnet by default) through staged pipelines with verification gates. The orchestrator thinks, briefs, gates, and rules; workers execute all file-level work and report back with measured evidence. Use ONLY when the user explicitly invokes /orchestrate or names this skill by name. Do not trigger on general mentions of subagents, launching agents, or parallel work.
+description: Run multi-stage builds as a pure orchestrator directing worker subagents on Sonnet by default (unless changed) through staged pipelines with verification gates. The orchestrator is whatever model started the session (Fable, Opus, Sonnet, or otherwise); it thinks, briefs, gates, and rules, while workers execute all file-level work and report back with measured evidence. Use ONLY when the user explicitly invokes /orchestrate or names this skill by name. Do not trigger on general mentions of subagents, launching agents, or parallel work.
 ---
 
 <role_definition>
