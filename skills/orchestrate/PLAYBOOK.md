@@ -1,5 +1,5 @@
 <worker_brief_template>
-Every worker brief carries these sections, in this order, whether the worker's role is recon, build, merge, or closeout: the Scope section is where role differs (recon: read-only, no commits, no writes; merge: reconciliation against the updated mainline and sequencing; closeout: status docs, registries, and the final regression backstop), not a separate template. Omit a section only when it genuinely does not apply.
+Every worker brief carries these sections, in this order, whether the worker's role is recon, build, merge, deploy, or closeout: the Scope section is where role differs (recon: read-only, no commits, no writes; merge: reconciliation against the updated mainline and sequencing; deploy: live-system safety limits and the rollback path; closeout: status docs, registries, and the final regression backstop), not a separate template. Omit a section only when it genuinely does not apply. On small single-track missions, Hard style rules, Reporting integrity, and If blocked stay mandatory in full; the remaining sections may be condensed to a sentence each.
 
 ### Identity and workspace
 - Who the worker is (track, stage), the exact workspace path (worktree or primary checkout), the branch, the expected starting HEAD, and "work ONLY there".
@@ -51,7 +51,7 @@ Verification workers analyze and report; they change nothing in the repo and fol
 - Audit for leaked credentials: scan the build worker's diff and commit messages for secret values, and confirm the project's secrets scan ran where one exists.
 - For live-system checks: pre-read the test to confirm it only touches self-created state BEFORE running it; verify zero orphaned rows after; never apply migrations or fix infrastructure unless the brief explicitly authorizes it, report instead.
 - "Flag any discrepancy loudly." A verifier that finds the tree healthy but the report wrong should say exactly that.
-- If blocked: authority contradiction, expected-vs-found mismatch, or blast-radius pressure. STOP and report precisely rather than improvising a fix; verifiers never apply fixes themselves.
+- If blocked: authority contradiction, expected-vs-found mismatch, or blast-radius pressure. STOP and report precisely rather than improvising a fix; verifiers apply no fixes beyond what their brief explicitly authorizes.
 - Final message spec: an explicit lettered list of what the report must contain: the claims checklist with pass/fail per item, exact measured output lines per suite, the discrepancies found (if any), and any spot-checked file:line citations.
 </verification_brief_template>
 
