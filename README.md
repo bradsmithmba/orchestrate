@@ -44,7 +44,7 @@ Copy `skills/orchestrate/` into your Claude Code skills directory (`~/.claude/sk
 
 Invoke explicitly with `/orchestrate` or by naming the skill. It is deliberately scoped not to trigger on general mentions of subagents or parallel work, only on an explicit call, so it never hijacks a normal session.
 
-Once running, the orchestrator asks a handful of high-leverage questions up front (done bar, safety limits, live-service bindings, budget posture) before dispatching any work.
+Once running, the orchestrator asks a handful of high-leverage questions up front before dispatching any work.
 
 ## License
 
