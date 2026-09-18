@@ -1,6 +1,0 @@
-[
-  {"id": "a", "enabled": true, "retries": 0},
-  {"id": "b", "enabled": false, "retries": 3},
-  {"id": "c", "enabled": true, "retries": 2},
-  {"id": "d", "enabled": true, "retries": 1}
-]

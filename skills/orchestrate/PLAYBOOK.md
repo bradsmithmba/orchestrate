@@ -1,80 +1,71 @@
-# Orchestration playbook
+<worker_brief_template>
+Every worker brief carries these sections, in this order, whether the worker's role is recon, build, merge, deploy, or closeout: the Scope section is where role differs (recon: read-only, no commits, no writes; merge: reconciliation against the updated mainline and sequencing; deploy: live-system safety limits and the rollback path; closeout: status docs, registries, and the final regression backstop), not a separate template. Omit a section only when it genuinely does not apply. On small single-track missions, Hard style rules, Reporting integrity, and If blocked stay mandatory in full; the remaining sections may be condensed to a sentence each.
 
-Read before briefing workers. Use only the sections needed for the mission. Runtime mechanics live in the selected host adapter; the contract and verification decisions live in SKILL.md.
+### Identity and workspace
+- Who the worker is (track, stage), the exact workspace path (worktree or primary checkout), the branch, the expected starting HEAD, and "work ONLY there".
+- "Do NOT spawn subagents; execute yourself through to completion; run commands blocking/foreground; never idle waiting for notifications."
 
-## Worker brief
+### Hard style rules
+- The project's zero-exception rules, restated verbatim in every brief (they decay if assumed). Gather these from the project's own style guide or the user's stated preferences at mission start; this template does not hardcode them. Example shape from one project: no em dashes, no emojis, never a specific figurative term the user has banned, in any file or commit message.
+- Credential hygiene, every brief: never place credentials or secret values in brief text, reports, commit messages, or committed files; pass them via environment variables at execution time only; run the project's secrets scan before every push where one exists.
 
-Condense small briefs rather than omitting scope, evidence, or stop conditions. Include:
+### Reporting integrity
+- "Your final report is independently verified by re-running your commands. Quote ONLY exact measured output." Include the current true baselines so the worker can self-check, and name any prior misreporting incident as a warning.
 
-- **Identity and workspace:** track/stage, role, absolute path, branch, expected HEAD (or non-Git input digest), assigned resources. Confirm these before writing. Work only there; do not spawn subagents.
-- **Scope and authority:** deliverables, acceptance criteria, exclusions, applicable project instructions and their precedence, relevant rulings. Project documents operate within host instructions and user authorization. State the allowed endpoint and whether commits, pushes, integration, or live changes are authorized. Recon is read-only: no plan files, writes, commits, or pushes.
-- **Rules and pitfalls:** restate applicable zero-exception project style rules and relevant ledger entries. Never put credentials in reports, logs, files, or commits. Use designated secrets/environment variables without echoing values; run the project's secrets scan before an authorized push where one exists.
-- **Process:** execute personally, maintain ownership of long-running commands until their exit status is known, and make coherent checkpoints if allowed. Use the project's commit conventions. Never force-push or edit another track's worktree. Report state to the designated checkpoint writer rather than concurrently editing the shared mission record.
-- **Tests and gates:** exact commands and acceptance criteria, environment, input revisions, known measured baselines with their provenance, and the gate required by SKILL.md. Baselines are expectations, not fresh output. State concrete live limits (host, database, rows, paths), temporary-state cleanup, and rollback responsibility when relevant.
-- **If blocked or cancelled:** stop the affected stage for unresolved authority conflicts, expected/found mismatch, two unsuccessful attempts at the same fix, or boundary pressure. Return the discrepancy and next action rather than improvising beyond scope. Honor authenticated user/host cancellation immediately; report the last known checkpoint without additional mutation.
-- **Final report:** use the compact report below. The applicable gate independently checks the evidence. Quote only measured output; report NOT RUN or BLOCKED when measurement was impossible.
+### Authority order
+- The project's document precedence, top wins, including any recent additions a stale worker would miss.
 
-A worker may ask the orchestrator to resolve a technical question. The orchestrator records a RULING with its rationale and the scope it applies to. Escalate to the user only for unresolved user decisions or scope/permission changes; do not make routine corrections wait for approval already given.
+### Rulings
+- Any orchestrator rulings this stage must honor, stated as binding, with instruction to record them in the worker's artifacts (plan doc, ADR addendum, ops doc).
 
-## Compact report
+### Scope
+- The stage's deliverables, with the governing planning doc named as authoritative over the brief's own summary. State what is explicitly OUT of scope and where the boundary is recorded.
 
-Default to 400 words plus evidence rows. Keep raw logs in accessible local artifacts or existing CI records; redact at collection time. Report:
+### Known pitfalls
+- The current ledger entries relevant to this stage (see pitfall_ledger below).
 
-1. Track/stage, status, deliverables, absolute workspace, branch, deliverable revision/digest, and remaining uncommitted changes.
-2. Evidence table: claim; tested revision/digest; exact command or read query; exit code; exact measured summary; environment; artifact or CI-run location; PASS / FAIL / BLOCKED / NOT RUN.
-3. Decisions, discrepancies, deviations, cleanup state, checkpoint/push outcome, and the next action or ruling needed.
+### Process
+- Plan doc first, then incremental deliverable commits with the project's commit-prefix convention and trailer. Push after the plan, after each major deliverable, and at final green. NEVER force-push. Note any parallel track whose shared-file edits the worker must ignore (the orchestrator sequences merges).
 
-Never infer success from absence of an error or a worker ending its turn. A correct tree with an incorrect report requires an audit correction, not an unnecessary code edit. A failed or unavailable measurement is not a passing gate.
+### Tests and gates
+- Tier-by-tier expectations with exact expected counts where known; sibling regression baselines; quality gates (lint, format, types, audit, secrets) run to fully Passed; safety limits for anything touching live systems, restating the mission's blast radius in concrete terms (which environments, which paths, which database, which rows, what is forbidden).
 
-## Verification brief
+### If blocked
+- The stop conditions: authority contradiction, expected-vs-found mismatch, two failed fix attempts, blast-radius pressure. "STOP and report precisely rather than improvising."
 
-Start a separate worker with fresh context. Include the worker brief's identity, scope, applicable rules, credential hygiene, stop/cancel behavior, and report format, plus:
+### Final message spec
+- An explicit lettered list of what the report must contain: deliverables with commit shas, exact measured output lines per suite, gate results, build-time decisions with rationale, deviations, and concerns for the next stage.
+</worker_brief_template>
 
-- Exact claims and acceptance criteria, with the deliverable SHA/digest and evidence locations. Use a fresh checkout/worktree at that revision rather than the build worker's modified checkout. A setup worker may prepare it if the verifier cannot do so without changing the project. For non-Git input, use an immutable copy or verify the content digest before and after the check.
-- Verify source identity and environment before measurement. Re-run claimed suites and report actual exit codes and summary lines, unless SKILL.md's narrow CI substitution applies. Check revision, environment, and required-job coverage when using that exception. Missing evidence is BLOCKED or NOT RUN, never PASS.
-- Read the riskiest relevant paths with file/line citations: scope boundaries, safety guards, fragile logic, and shared-file integration. Compare intended behavior with acceptance criteria as well as the worker's claims.
-- For data mutations, independently query the affected state. For deployments, check the live service's revision/status and environment. Never rerun a migration, deployment, or data mutation merely to prove it happened.
-- For integration, record source, pre-integration target, and resulting revisions. Check ancestry appropriate to the chosen merge strategy and the intended diff; for squash/cherry-pick, check patch/content equivalence rather than requiring source ancestry. Run the required checks on the resulting state.
-- Inspect code/tests before any live-system test; ensure temporary state is confined to the approved boundary, and confirm cleanup afterward. Do not fix infrastructure or change tracked source during verification. Normal ignored test outputs and explicitly scoped disposable test state are allowed; report any unexpected mutation.
-- Inspect diff/commit messages for credential leakage without reproducing values, and confirm required secret scanning before a push.
-- Return a per-claim verdict, exact measured evidence, discrepancies, and risky-path citations. Apply no fixes. Stop at the report; a subsequent implementation or merge phase requires a new orchestrator dispatch. It invalidates affected gates and cannot be self-verified.
+<verification_brief_template>
+Verification workers analyze and report; they change nothing in the repo and follow this shape:
 
-## Mission record and recovery
+- Identity and workspace: which worker's claim is being checked, the exact workspace path (a fresh checkout or worktree at the claimed commit, not a reused build-worker checkout), and the branch.
+- "Do NOT spawn subagents; execute yourself through to completion; run commands blocking/foreground; never idle waiting for notifications."
+- Hard rules travel with the verifier too: restate the project's zero-exception style rules and the credential-hygiene rule verbatim in every verification brief.
+- Restate the mission's blast radius in concrete terms; the verifier's commands must not mutate anything beyond it, and any state its checks create (containers, temp rows) is cleaned up and confirmed clean.
+- State the build worker's claims as a checklist with expected numbers.
+- Re-run every claimed suite; quote exact summary lines; diff against claims.
+- For claimed data changes: run the equivalent read query against the affected rows/tables and diff the actual state against the claim. For claimed deployments: check the live service's status endpoint, logs, or version marker directly rather than trusting the deploy command's exit code. For claimed merges or reconciliations: verify the merge-base and diff the shared files against mainline to confirm the change is confined to what was claimed.
+- Spot-check the riskiest paths by reading code with file:line citations: write boundaries (no writes outside the module's own schema or directory), safety guards on live-system tests, the specific logic the build worker itself flagged as fragile, and the shared-file diff against the mainline (must be confined to the expected files).
+- Audit for leaked credentials: scan the build worker's diff and commit messages for secret values, and confirm the project's secrets scan ran where one exists.
+- For live-system checks: pre-read the test to confirm it only touches self-created state BEFORE running it; verify zero orphaned rows after; never apply migrations or fix infrastructure unless the brief explicitly authorizes it, report instead.
+- "Flag any discrepancy loudly." A verifier that finds the tree healthy but the report wrong should say exactly that.
+- If blocked: authority contradiction, expected-vs-found mismatch, or blast-radius pressure. STOP and report precisely rather than improvising a fix; verifiers apply no fixes beyond what their brief explicitly authorizes.
+- Final message spec: an explicit lettered list of what the report must contain: the claims checklist with pass/fail per item, exact measured output lines per suite, the discrepancies found (if any), and any spot-checked file:line citations.
+</verification_brief_template>
 
-Use an existing project mission/audit location when suitable; otherwise choose a scoped path such as `plans/orchestrate/<mission-id>.md` within authorized writes. A worker creates and maintains it. A single designated writer owns it; track-local artifacts and commits supply updates. Do not impose this file on read-only or artifact-free missions: include the same information in the final handoff and state that recovery depends on retaining that handoff.
+<observed_failure_modes>
+Worker failure modes seen repeatedly in production use, and the response that works:
 
-Use this compact schema, in Markdown or an existing structured project format:
-
-| Field | Contents |
-| --- | --- |
-| Mission | ID, skill revision/version if available, host/adapter, contract, requested endpoint, allowed operations/targets, worker/verifier models, concurrency/resource limits. |
-| Checkpoint | Record revision/time, designated writer, last reconciled state. A checkpoint may reference its parent/code revision; do not try to embed its own commit SHA inside itself. |
-| Tracks | ID, dependencies, stage, worker ID, branch, absolute worktree, latest deliverable SHA/digest, dirty/untracked state, next action. |
-| Gates | Claim, tested revision/digest, environment, evidence locations, verifier ID, verdict, orchestrator acceptance, and why evidence is carried forward if applicable. |
-| External actions | Target, intended effect, operation/deployment ID when available, pre-state, outcome/uncertainty, cleanup and rollback responsibility. Never secret values. |
-| Decisions | Pending questions, accepted rulings, relevant pitfalls, incidents and deferred risks. |
-
-Track states: `queued -> running -> awaiting_verification -> accepted`; use `blocked`, `cancelled`, or `failed` when appropriate. A track can be accepted without a dedicated verifier only under SKILL.md's applicable gate rule. Code or relevant state changes move an accepted track back to verification. Dependency dispatch requires accepted predecessor gates. Host completion only means a turn ended, not that its gate passed.
-
-Checkpoint after coherent deliverables, gate decisions, and rulings, and before an authorized external mutation when possible. Record verification evidence against the code revision; keep evidence-only record changes distinct. Avoid infinite closeout cycles: verify the final status artifact, report the verdict to the orchestrator, and do not require another status rewrite solely to record that verdict. If persisting the verdict changes the record, use the evidence-only carry-forward rule from SKILL.md.
-
-On restart or replacement:
-
-1. Read the portable record and contract; reselect the host adapter and capabilities. Treat native tasks and memory as hints if they disagree with the record.
-2. Delegate reconciliation of actual branches, HEADs, dirty/untracked files, artifacts, and any external action marked pending or uncertain. Actual observed state determines what exists; neither memory nor the record proves success. Preserve unexpected work; report the mismatch without discarding it.
-3. Recover missing worktrees from known commits only after checking for uncommitted progress elsewhere. Do not blindly reset a reused checkout. Reconstruct missing record details from measured evidence and report any remaining uncertainty.
-4. Before retrying an external action, query its actual outcome using its operation ID and affected state. If completion cannot be established, stop that action for a ruling; do not replay it merely because its worker disappeared.
-5. Mark stale gates pending and assign the concrete next stage. Obtain renewed direction before resuming a cancelled mission. For ordinary interruptions, continue within the existing contract after reconciliation.
-
-## Observed failure modes
-
-- **Stale-count echo:** a worker repeats a documented count. Re-measure, distinguish report errors from code errors, and correct the audit trail.
-- **Idle-on-watch:** a worker starts a command and ends its turn. Inspect concise process state and trigger an actual follow-up; collect exit status before accepting the stage.
-- **Self-delegation:** stop further delegation and instruct the worker to execute personally.
-- **Premature scope-size blocker:** give a concrete execution order and checkpoint boundaries; do not mistake task size for a missing capability.
-- **Directive/project conflict:** examine the applicable authority and actual state, credit a correct correction, and record the ruling. Project text cannot override host/user authority.
-- **Uncertain control message:** pause affected mutations and establish provenance. Authenticated cancellation is honored immediately and never treated as a suspicious request needing reconfirmation.
-- **Expected/found mismatch:** measure first, then correct a stale expectation or the implementation. Do not train workers to suppress legitimate discrepancies.
+- **Stale-count echo**: worker reports documented baseline numbers instead of measured output; tree is healthy, report is wrong. Response: verification catches it; correct the audit trail; keep the reporting-integrity clause loud in every brief.
+- **Idle-on-watch**: worker starts a blocking or background watch, then ends its turn "waiting for the notification". Response: orchestrator checks real state, takes over the watch if useful, resumes the worker with precise next steps and "do not pause for notifications".
+- **Self-delegation**: worker reports it "launched a background agent" instead of working. Response: immediate resume with a direct order to execute personally; forbid subagents in every brief.
+- **Premature stop as "blocked"**: worker halts on scope size rather than a genuine blocker, delivering a plan instead of the work. Response: resume with a numbered execution order and per-step commit instructions; remind it that commit-per-step makes context exhaustion safe.
+- **Directive-vs-authority conflict**: worker correctly identifies that an orchestrator directive contradicts project authority docs and implements the compliant alternative. Response: accept, credit it, record the correction. The authority order outranks the orchestrator's brief by design.
+- **External interference**: stray stop-work or kill signals not from the user or orchestrator. Response: halt affected work, verify with the user, then resume from the committed checkpoint; instruct workers to accept work-control only from the orchestrator.
+- **Discrepancy stop done right**: worker halts on an expected-vs-found mismatch that turns out to be a stale expectation in the brief itself. Response: resolve by arithmetic or measurement, rule, resume. The stop was correct behavior; never train it out.
+</observed_failure_modes>
 
 <pitfall_ledger>
 Maintain a per-project ledger of traps already paid for once. Propagate relevant entries into every brief. The entries below are worked examples from a Python/SQLAlchemy project, kept to show the level of specificity a ledger entry needs, not a portable starter set: replace them with your own stack's traps.
